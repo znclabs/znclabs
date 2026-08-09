@@ -82,6 +82,6 @@ insert into sources (name, feed_url, category) values
   ('NPR News', 'https://feeds.npr.org/1001/rss.xml', 'gundem'),
   ('TechCrunch', 'https://techcrunch.com/feed/', 'teknoloji'),
   ('Ars Technica', 'https://feeds.arstechnica.com/arstechnica/index', 'teknoloji'),
-  ('Reuters Business', 'https://feeds.reuters.com/reuters/businessNews', 'ekonomi'),
+  ('CNBC Business', 'https://www.cnbc.com/id/10001147/device/rss/rss.html', 'ekonomi'),
   ('Financial Times - Home', 'https://www.ft.com/rss/home', 'ekonomi')
 on conflict (feed_url) do nothing;

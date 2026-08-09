@@ -1,5 +1,5 @@
 import Groq from "groq-sdk";
-import { articleOutputSchema, type ArticleOutput } from "./prompt";
+import { parseArticleOutput, type ArticleOutput } from "./prompt";
 
 export const GROQ_MODEL = "llama-3.3-70b-versatile";
 
@@ -23,7 +23,6 @@ export async function generateArticle(
   const completion = await groq.chat.completions.create({
     model: GROQ_MODEL,
     temperature: 0.7,
-    response_format: { type: "json_object" },
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
@@ -33,6 +32,5 @@ export async function generateArticle(
   const raw = completion.choices[0]?.message?.content;
   if (!raw) throw new Error("Groq returned empty response");
 
-  const parsed = JSON.parse(raw);
-  return articleOutputSchema.parse(parsed);
+  return parseArticleOutput(raw);
 }

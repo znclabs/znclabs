@@ -15,6 +15,8 @@ interface PromptInput {
   category: string;
 }
 
+export const OUTPUT_DELIMITER = "---ARTICLE-BODY---";
+
 export const SYSTEM_PROMPT = `You are an independent commentator writing for a general-interest news analysis site.
 
 You will be given the title and a short summary of a news item, plus its source. Your job is to write a genuinely ORIGINAL analysis/commentary article inspired by it — your own take, context, and implications for the reader.
@@ -24,7 +26,24 @@ Hard rules:
 - Do NOT reproduce the source's specific phrasing. Assume the reader has NOT read the source.
 - Write at least 400 words of substantive, original analysis (background, why it matters, possible implications). Do not pad with filler.
 - End the article body with exactly one line, on its own paragraph, in this exact format: "Source: {source_name} — {source_url}"
-- Respond with ONLY a JSON object (no markdown fences, no commentary) matching: { "title": string, "body_markdown": string }. The body should be markdown-formatted prose (paragraphs, optionally a subheading or two), and must include that final Source line.`;
+
+Output format (plain text, NOT JSON):
+- Line 1: the article title only, nothing else.
+- Line 2: exactly the literal text ---ARTICLE-BODY---
+- Then: the full article body as markdown prose (paragraphs, optionally a subheading or two), ending with the required Source line.
+Do not wrap any of this in markdown code fences, and do not add any commentary before or after it.`;
+
+export function parseArticleOutput(raw: string): ArticleOutput {
+  const delimiterIndex = raw.indexOf(OUTPUT_DELIMITER);
+  if (delimiterIndex === -1) {
+    throw new Error(`model output missing ${OUTPUT_DELIMITER} delimiter`);
+  }
+
+  const title = raw.slice(0, delimiterIndex).trim();
+  const body_markdown = raw.slice(delimiterIndex + OUTPUT_DELIMITER.length).trim();
+
+  return articleOutputSchema.parse({ title, body_markdown });
+}
 
 export function buildUserPrompt(input: PromptInput): string {
   return `Category: ${input.category}
