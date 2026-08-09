@@ -1,0 +1,21 @@
+name: content-pipeline
+
+on:
+  schedule:
+    - cron: "*/45 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node automation/trigger-pipeline.mjs
+        env:
+          MEDIA_BASE_URL: ${{ secrets.MEDIA_BASE_URL }}
+          STUDIO_BASE_URL: ${{ secrets.STUDIO_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          STUDIO_API_SECRET: ${{ secrets.STUDIO_API_SECRET }}
